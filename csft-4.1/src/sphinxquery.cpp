@@ -1073,7 +1073,6 @@ bool XQParser_t::Parse ( XQQuery_t & tParsed, const char * sQuery, const ISphTok
 	// setup parser
 	m_pParsed = &tParsed;
 	m_sQuery = (BYTE*) sQuery;
-        printf("xxxxxx=======:%s\n", m_sQuery);
 	m_iQueryLen = strlen(sQuery);
 	m_pTokenizer = pMyTokenizer.Ptr();
 	m_pSchema = pSchema;
@@ -1126,7 +1125,7 @@ bool XQParser_t::Parse ( XQQuery_t & tParsed, const char * sQuery, const ISphTok
 
 //////////////////////////////////////////////////////////////////////////
 
-#define XQDEBUG 1
+#define XQDEBUG 0
 
 #if XQDEBUG
 static void xqIndent ( int iIndent )
