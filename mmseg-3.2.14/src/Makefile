@@ -178,10 +178,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.7
-abs_builddir = /opt/src/coreseek-4.1-beta/mmseg-3.2.14/src
-abs_srcdir = /opt/src/coreseek-4.1-beta/mmseg-3.2.14/src
-abs_top_builddir = /opt/src/coreseek-4.1-beta/mmseg-3.2.14
-abs_top_srcdir = /opt/src/coreseek-4.1-beta/mmseg-3.2.14
+abs_builddir = /opt/src/sphinx-hy/mmseg-3.2.14/src
+abs_srcdir = /opt/src/sphinx-hy/mmseg-3.2.14/src
+abs_top_builddir = /opt/src/sphinx-hy/mmseg-3.2.14
+abs_top_srcdir = /opt/src/sphinx-hy/mmseg-3.2.14
 ac_aux_dir = config
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -211,7 +211,7 @@ host_vendor = redhat
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /opt/src/coreseek-4.1-beta/mmseg-3.2.14/config/install-sh
+install_sh = ${SHELL} /opt/src/sphinx-hy/mmseg-3.2.14/config/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -270,9 +270,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnits src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/Makefile
+	  $(AUTOMAKE) --gnits src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -367,6 +367,22 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+
+installcheck-binPROGRAMS: $(bin_PROGRAMS)
+	bad=0; pid=$$$$; list="$(bin_PROGRAMS)"; for p in $$list; do \
+	  case ' $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT) ' in \
+	   *" $$p "* | *" $(srcdir)/$$p "*) continue;; \
+	  esac; \
+	  f=`echo "$$p" | \
+	     sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  for opt in --help --version; do \
+	    if "$(DESTDIR)$(bindir)/$$f" $$opt >c$${pid}_.out \
+	         2>c$${pid}_.err </dev/null \
+		 && test -n "`cat c$${pid}_.out`" \
+		 && test -z "`cat c$${pid}_.err`"; then :; \
+	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \
+	  done; \
+	done; rm -f c$${pid}_.???; exit $$bad
 mmseg$(EXEEXT): $(mmseg_OBJECTS) $(mmseg_DEPENDENCIES) 
 	@rm -f mmseg$(EXEEXT)
 	$(CXXLINK) $(mmseg_OBJECTS) $(mmseg_LDADD) $(LIBS)
@@ -752,7 +768,7 @@ install-ps: install-ps-am
 
 install-ps-am:
 
-installcheck-am:
+installcheck-am: installcheck-binPROGRAMS
 
 maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
@@ -787,12 +803,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	install-info install-info-am install-libLTLIBRARIES \
 	install-man install-pdf install-pdf-am \
 	install-pkgincludeHEADERS install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-pkgincludeHEADERS
+	install-strip installcheck installcheck-am \
+	installcheck-binPROGRAMS installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-libLTLIBRARIES uninstall-pkgincludeHEADERS
 
 
 # Regenerate common.h with config.status whenever common-h.in changes.
