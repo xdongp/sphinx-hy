@@ -4811,7 +4811,8 @@ struct RankerState_MatchAny_fn : public RankerState_Proximity_fn<false,false>
 			if ( m_uMatchMask[i] ){
 				//uRank += ( sphBitCount ( m_uMatchMask[i] ) + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
 				int bit = sphBitCount ( m_uMatchMask[i] );
-				uRank += ( bit + (bit-1)*m_uQueryWeight[i]*m_iPhraseK + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
+				uRank += ( bit + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
+				//uRank += ( bit + (bit-1)*m_uQueryWeight[i]*m_iPhraseK + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
 				/*
 				if(m_iPrint)
 				sphInfo("==============uRank: %d,filed: %d: sphBitCount ( m_uMatchMask[i] ):%d,  m_uQueryWeight[i]: %d, m_uLCS[i]:%d, m_iPhraseK:%d\n", 

@@ -201,8 +201,8 @@ u2 ChineseCharTaggerImpl::tagUnicode(u2 iCode, u1 length){
 	if(length>3)
 		return 0;
 #endif	
-	//u'\u4e00' < �� <u'\u9fff' Chinese Char
-	//CJK Symbols and Punctuation ��Χ���� u+3000 �� u+303F
+	//
+	//
 	u2 flags[4] = { 0x0, /* 1 char */
 		0x40, /* 2 char 0100 0000 */
 		0x80, /* 3 char 1000 0000 */

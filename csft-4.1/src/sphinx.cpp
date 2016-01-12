@@ -14552,7 +14552,7 @@ XQNode_t * CSphIndex_VLN::DoExpansion ( XQNode_t * pNode, BYTE * pBuff, int iFD,
 			XQNode_t * pWord = new XQNode_t;
 			pWord->m_dWords.Add ( pNode->m_dWords[i] );
 			pNode->m_dChildren.Add ( DoExpansion ( pWord, pBuff, iFD, pResult ) );
-			pNode->m_dChildren.Last()->m_iAtomPos = pNode->m_dWords[i].m_iAtomPos; //ÕâÊÇ¸³Öµpos
+			pNode->m_dChildren.Last()->m_iAtomPos = pNode->m_dWords[i].m_iAtomPos;
 
 			// tricky part
 			// current node may have field/zone limits attached
