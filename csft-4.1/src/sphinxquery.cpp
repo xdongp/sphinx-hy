@@ -1233,7 +1233,9 @@ bool sphParseExtendedQuery ( XQQuery_t & tParsed, const char * sQuery, const ISp
 	int min = 1<<30;
 	// set weight and get min weight
 	xqSetWordWeight ( tParsed.m_pRoot, pTokenizer->m_pQueryDict, &min );
+#if XQDEBUG
 	printf("*****************min : %d *****************\n", min);
+#endif
 	// set the min weight node to 1, others to 0	
 	xqSetMainWordWeight ( tParsed.m_pRoot,  min );
 

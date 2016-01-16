@@ -4539,6 +4539,7 @@ struct RankerState_Proximity_fn
 	int m_iFields;
 	const int * m_pWeights;
 
+        DWORD m_uOldQueryPos;
 	DWORD m_uLcsTailPos;
 	DWORD m_uLcsTailQposMask;
 	DWORD m_uCurQposMask;
@@ -4556,6 +4557,7 @@ struct RankerState_Proximity_fn
 		m_uLcsTailQposMask = 0;
 		m_uCurQposMask = 0;
 		m_uCurPos = 0;
+		m_uOldQueryPos = 0;
 
 		return true;
 	}
@@ -4567,10 +4569,19 @@ struct RankerState_Proximity_fn
 			// all query keywords are unique
 			// simpler path (just do the delta)
 			int iDelta = HITMAN::GetLCS ( pHlist->m_uHitpos ) - pHlist->m_uQuerypos;
-			if ( iDelta==m_iExpDelta )
+			//sphInfo("=== !HANDLE_DUPES 111 GetLCS  m_uCurLCS:%d,  BYTE(pHlist->m_uWeight):%d ===", m_uCurLCS, BYTE(pHlist->m_uWeight) );
+			// count query pos distance
+			int iQueryPosDis = 0;
+			if (m_uOldQueryPos)
+			    iQueryPosDis =  pHlist->m_uQuerypos - m_uOldQueryPos;
+			//sphInfo("=== !HANDLE_DUPES 222 GetLCS  iQueryPosDis:%d,  m_uOldQueryPos:%d , pHlist->m_uQuerypos:%d ===", iQueryPosDis, m_uOldQueryPos, pHlist->m_uQuerypos);
+			m_uOldQueryPos = pHlist->m_uQuerypos;
+				
+			if ( iDelta==m_iExpDelta && iQueryPosDis==1 )
 				m_uCurLCS = m_uCurLCS + BYTE(pHlist->m_uWeight);
 			else
 				m_uCurLCS = BYTE(pHlist->m_uWeight);
+			//sphInfo("=== !HANDLE_DUPES GetLCS iDelta:%d, m_iExpDelta:%d, m_uCurLCS:%d ===", iDelta, m_iExpDelta, m_uCurLCS );
 
 			DWORD uField = HITMAN::GetField ( pHlist->m_uHitpos );
 			if ( m_uCurLCS>m_uLCS[uField] )
@@ -4779,7 +4790,7 @@ struct RankerState_MatchAny_fn : public RankerState_Proximity_fn<false,false>
 	{
 		RankerState_Proximity_fn<false,false>::Init ( iFields, pWeights, pRanker, sError );
 		m_iPhraseK = 0;
-		//m_iPrint = 0;
+		//m_iPrint = 1;
 		for ( int i=0; i<iFields; i++ )
 			m_iPhraseK += pWeights[i] * pRanker->m_iQwords;
 		memset ( m_uMatchMask, 0, sizeof(m_uMatchMask) );
@@ -4792,13 +4803,12 @@ struct RankerState_MatchAny_fn : public RankerState_Proximity_fn<false,false>
 		RankerState_Proximity_fn<false,false>::Update ( pHlist );
 		m_uMatchMask [ HITMAN::GetField ( pHlist->m_uHitpos ) ] |= ( 1<<(pHlist->m_uQuerypos-1) );
 		m_uQueryWeight [ HITMAN::GetField ( pHlist->m_uHitpos ) ] |= pHlist->m_uQueryWeight;
-		/*
-		if(  pHlist->m_uDocid == 2027331 ||  pHlist->m_uDocid == 2016367 || pHlist->m_uDocid == 2016111)
+		/*if(  pHlist->m_uDocid == 2027331 ||  pHlist->m_uDocid == 2016367 || pHlist->m_uDocid == 2016111)
 			m_iPrint = 1;
 		if(m_iPrint)
-			sphInfo("==============docId: %d, queryWeight:%d , queryPos:%d==========\n", pHlist->m_uDocid, pHlist->m_uQueryWeight, pHlist->m_uQuerypos);
+			sphInfo("=== docId: %d, queryWeight:%d , queryPos:%d ===\n", pHlist->m_uDocid, pHlist->m_uQueryWeight, pHlist->m_uQuerypos);
 		*/
-	}
+	}	
 
 	DWORD Finalize ( const CSphMatch & )
 	{
@@ -4812,11 +4822,10 @@ struct RankerState_MatchAny_fn : public RankerState_Proximity_fn<false,false>
 				//uRank += ( sphBitCount ( m_uMatchMask[i] ) + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
 				int bit = sphBitCount ( m_uMatchMask[i] );
 				uRank += ( bit + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
-				//uRank += ( bit + (bit-1)*m_uQueryWeight[i]*m_iPhraseK + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
-				/*
+				/*uRank += ( bit + (bit-1)*m_uQueryWeight[i]*m_iPhraseK + m_uQueryWeight[i]*m_iPhraseK*1.1  + ( m_uLCS[i]-1 )*m_iPhraseK )*m_pWeights[i];
 				if(m_iPrint)
-				sphInfo("==============uRank: %d,filed: %d: sphBitCount ( m_uMatchMask[i] ):%d,  m_uQueryWeight[i]: %d, m_uLCS[i]:%d, m_iPhraseK:%d\n", 
-					 uRank, i, sphBitCount ( m_uMatchMask[i] ),  m_uQueryWeight[i],  m_uLCS[i], m_iPhraseK);
+				sphInfo("=== uRank: %d,filed: %d: sphBitCount ( m_uMatchMask[i] ):%d,  m_uQueryWeight[i]: %d, m_uLCS[i]:%d, m_iPhraseK:%d\n", 
+				uRank, i, sphBitCount ( m_uMatchMask[i] ),  m_uQueryWeight[i],  m_uLCS[i], m_iPhraseK);
 				*/
 			}
 			m_uMatchMask[i] = 0;
@@ -4824,11 +4833,9 @@ struct RankerState_MatchAny_fn : public RankerState_Proximity_fn<false,false>
 			m_uQueryWeight[i] = 0;
 		}
 		
-		/*
-		if(m_iPrint) 
+		/*if(m_iPrint) 
 			sphInfo("===================================================\n\n\n");
-		m_iPrint  = 0;
-		*/
+		m_iPrint  = 0;*/
 		return uRank;
 	}
 };
