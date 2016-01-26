@@ -32,8 +32,8 @@ enum XQStarPosition
 struct XQKeyword_t
 {
 	CSphString			m_sWord;
-	int					m_iAtomPos;
-	int					m_iQueryWeight;
+	int				m_iAtomPos;
+	int				m_iQueryWeight;
 	bool				m_bFieldStart;	///< must occur at very start
 	bool				m_bFieldEnd;	///< must occur at very end
 	DWORD				m_uStarPosition;
@@ -42,6 +42,7 @@ struct XQKeyword_t
 
 	XQKeyword_t ()
 		: m_iAtomPos ( -1 )
+		, m_iQueryWeight ( 0 )
 		, m_bFieldStart ( false )
 		, m_bFieldEnd ( false )
 		, m_uStarPosition ( STAR_NONE )
@@ -52,6 +53,7 @@ struct XQKeyword_t
 	XQKeyword_t ( const char * sWord, int iPos )
 		: m_sWord ( sWord )
 		, m_iAtomPos ( iPos )
+		, m_iQueryWeight ( 0 )
 		, m_bFieldStart ( false )
 		, m_bFieldEnd ( false )
 		, m_uStarPosition ( STAR_NONE )

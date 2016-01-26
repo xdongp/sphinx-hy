@@ -66,6 +66,7 @@ public:
 		: m_iWordID ( 0 )
 		, m_iTermPos ( 0 )
 		, m_iAtomPos ( 0 )
+		, m_iQueryWeight ( 0 ) 
 		, m_bExpanded ( false )
 		, m_bExcluded ( false )
 		, m_iDocs ( 0 )

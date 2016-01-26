@@ -428,5 +428,8 @@ int dict_load(dict * d,  char * path)
             dict_add(d, k, num);
         }
     }
+
+    if(line)
+        free(line);
     return 0;
 }
